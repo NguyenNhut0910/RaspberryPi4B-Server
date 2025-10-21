@@ -1,0 +1,594 @@
+/**
+ * Chart.js Internal Styling - Bank Transaction Manager
+ * Custom styling for Chart.js components, grid lines, labels, tooltips, legends
+ * Matches the design language of the current website
+ */
+
+/* ==========================================================================
+   Chart.js Global Configuration Variables
+   ========================================================================== */
+
+:root {
+    /* Primary Colors */
+    --chartjs-primary: #007bff;
+    --chartjs-primary-light: rgba(0, 123, 255, 0.2);
+    --chartjs-primary-dark: #0056b3;
+    
+    /* Secondary Colors */
+    --chartjs-secondary: #6c757d;
+    --chartjs-secondary-light: rgba(108, 117, 125, 0.2);
+    
+    /* Status Colors */
+    --chartjs-success: #28a745;
+    --chartjs-success-light: rgba(40, 167, 69, 0.2);
+    --chartjs-danger: #dc3545;
+    --chartjs-danger-light: rgba(220, 53, 69, 0.2);
+    --chartjs-warning: #ffc107;
+    --chartjs-warning-light: rgba(255, 193, 7, 0.2);
+    --chartjs-info: #17a2b8;
+    --chartjs-info-light: rgba(23, 162, 184, 0.2);
+    
+    /* Gradient Colors */
+    --chartjs-gradient-start: #667eea;
+    --chartjs-gradient-end: #764ba2;
+    
+    /* Text Colors */
+    --chartjs-text: #495057;
+    --chartjs-text-muted: #6c757d;
+    --chartjs-text-light: #868e96;
+    
+    /* Grid and Border Colors */
+    --chartjs-grid: rgba(0, 0, 0, 0.1);
+    --chartjs-border: #dee2e6;
+    
+    /* Background Colors */
+    --chartjs-bg: #ffffff;
+    --chartjs-bg-alt: #f8f9fa;
+    
+    /* Font Settings */
+    --chartjs-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --chartjs-font-size: 12px;
+    --chartjs-font-weight: 400;
+    --chartjs-font-weight-bold: 600;
+}
+
+/* Dark Theme Variables */
+[data-bs-theme="dark"] {
+    --chartjs-primary: #0d6efd;
+    --chartjs-primary-light: rgba(13, 110, 253, 0.3);
+    --chartjs-primary-dark: #0a58ca;
+    
+    --chartjs-text: #f8f9fa;
+    --chartjs-text-muted: #adb5bd;
+    --chartjs-text-light: #868e96;
+    
+    --chartjs-grid: rgba(255, 255, 255, 0.1);
+    --chartjs-border: #495057;
+    
+    --chartjs-bg: #212529;
+    --chartjs-bg-alt: #343a40;
+}
+
+/* ==========================================================================
+   Chart.js Color Palettes
+   ========================================================================== */
+
+/* Default color palette for charts */
+.chartjs-colors-default {
+    --color-1: #007bff;
+    --color-2: #28a745;
+    --color-3: #dc3545;
+    --color-4: #ffc107;
+    --color-5: #17a2b8;
+    --color-6: #6f42c1;
+    --color-7: #e83e8c;
+    --color-8: #fd7e14;
+    --color-9: #20c997;
+    --color-10: #6c757d;
+}
+
+/* Business color palette */
+.chartjs-colors-business {
+    --color-1: #2E86AB;
+    --color-2: #A23B72;
+    --color-3: #F18F01;
+    --color-4: #C73E1D;
+    --color-5: #4CAF50;
+    --color-6: #9C27B0;
+    --color-7: #FF5722;
+    --color-8: #607D8B;
+    --color-9: #795548;
+    --color-10: #FF9800;
+}
+
+/* Gradient color palette */
+.chartjs-colors-gradient {
+    --color-1: linear-gradient(45deg, #667eea, #764ba2);
+    --color-2: linear-gradient(45deg, #f093fb, #f5576c);
+    --color-3: linear-gradient(45deg, #4facfe, #00f2fe);
+    --color-4: linear-gradient(45deg, #43e97b, #38f9d7);
+    --color-5: linear-gradient(45deg, #fa709a, #fee140);
+    --color-6: linear-gradient(45deg, #a8edea, #fed6e3);
+    --color-7: linear-gradient(45deg, #ff9a9e, #fecfef);
+    --color-8: linear-gradient(45deg, #ffecd2, #fcb69f);
+}
+
+/* ==========================================================================
+   Chart.js Component Overrides
+   ========================================================================== */
+
+/**
+ * Chart.js Internal Styling Configuration - Bank Transaction Manager
+ * CSS variables and classes for Chart.js theming that matches website design
+ * Use these variables in Chart.js JavaScript configuration
+ */
+
+/* ==========================================================================
+   Chart.js Theme Variables
+   ========================================================================== */
+
+:root {
+    /* Chart Colors - Primary Palette */
+    --chartjs-primary: #007bff;
+    --chartjs-primary-rgb: 0, 123, 255;
+    --chartjs-primary-light: rgba(0, 123, 255, 0.2);
+    --chartjs-primary-dark: #0056b3;
+    
+    /* Chart Colors - Status Palette */
+    --chartjs-success: #28a745;
+    --chartjs-success-rgb: 40, 167, 69;
+    --chartjs-danger: #dc3545;
+    --chartjs-danger-rgb: 220, 53, 69;
+    --chartjs-warning: #ffc107;
+    --chartjs-warning-rgb: 255, 193, 7;
+    --chartjs-info: #17a2b8;
+    --chartjs-info-rgb: 23, 162, 184;
+    --chartjs-secondary: #6c757d;
+    --chartjs-secondary-rgb: 108, 117, 125;
+    
+    /* Chart Colors - Extended Palette */
+    --chartjs-purple: #6f42c1;
+    --chartjs-pink: #e83e8c;
+    --chartjs-orange: #fd7e14;
+    --chartjs-teal: #20c997;
+    --chartjs-indigo: #6610f2;
+    
+    /* Chart Text and UI Colors */
+    --chartjs-text: #495057;
+    --chartjs-text-muted: #6c757d;
+    --chartjs-text-light: #adb5bd;
+    --chartjs-border: rgba(0, 0, 0, 0.1);
+    --chartjs-grid: rgba(0, 0, 0, 0.1);
+    --chartjs-grid-muted: rgba(0, 0, 0, 0.05);
+    
+    /* Chart Background Colors */
+    --chartjs-bg: #ffffff;
+    --chartjs-bg-secondary: #f8f9fa;
+    --chartjs-bg-tooltip: rgba(0, 0, 0, 0.8);
+    
+    /* Chart Typography */
+    --chartjs-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --chartjs-font-size-sm: 11px;
+    --chartjs-font-size: 12px;
+    --chartjs-font-size-lg: 14px;
+    --chartjs-font-weight: 400;
+    --chartjs-font-weight-bold: 600;
+    
+    /* Chart Sizing */
+    --chartjs-border-width: 2;
+    --chartjs-border-radius: 4;
+    --chartjs-point-radius: 4;
+    --chartjs-point-hover-radius: 6;
+    --chartjs-line-tension: 0.4;
+}
+
+/* Dark Theme Variables */
+[data-bs-theme="dark"] {
+    --chartjs-primary: #0d6efd;
+    --chartjs-primary-rgb: 13, 110, 253;
+    --chartjs-text: #f8f9fa;
+    --chartjs-text-muted: #adb5bd;
+    --chartjs-text-light: #6c757d;
+    --chartjs-border: rgba(255, 255, 255, 0.15);
+    --chartjs-grid: rgba(255, 255, 255, 0.1);
+    --chartjs-grid-muted: rgba(255, 255, 255, 0.05);
+    --chartjs-bg: #212529;
+    --chartjs-bg-secondary: #343a40;
+    --chartjs-bg-tooltip: rgba(0, 0, 0, 0.9);
+}
+
+/* ==========================================================================
+   Chart.js Component Styling Classes
+   ========================================================================== */
+
+/* Chart Canvas Container */
+.chartjs-size-monitor,
+.chartjs-size-monitor-expand,
+.chartjs-size-monitor-shrink {
+    position: absolute;
+    direction: ltr;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+    visibility: hidden;
+    z-index: -1;
+}
+
+/* Chart Rendering Monitor */
+.chartjs-render-monitor {
+    animation: chartFadeIn 0.3s ease-out;
+}
+
+@keyframes chartFadeIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.98); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+/* ==========================================================================
+   Tooltip Styling Override Classes
+   ========================================================================== */
+
+/* Custom Tooltip Styling */
+div[id^="chartjs-tooltip"] {
+    background: var(--chartjs-bg-tooltip) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    color: white !important;
+    font-family: var(--chartjs-font-family) !important;
+    font-size: var(--chartjs-font-size) !important;
+    font-weight: var(--chartjs-font-weight) !important;
+    padding: 12px !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    transition: all 0.1s ease !important;
+    z-index: 1000 !important;
+    max-width: 300px !important;
+    word-wrap: break-word !important;
+}
+
+[data-bs-theme="dark"] div[id^="chartjs-tooltip"] {
+    background: rgba(52, 58, 64, 0.95) !important;
+    color: var(--chartjs-text) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Tooltip Arrow */
+div[id^="chartjs-tooltip"]:before {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--chartjs-bg-tooltip);
+}
+
+/* ==========================================================================
+   Legend Styling Override Classes
+   ========================================================================== */
+
+/* Legend Container */
+.chartjs-legend {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    padding: 16px 0 8px 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    font-family: var(--chartjs-font-family) !important;
+}
+
+.chartjs-legend ul {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+    justify-content: center !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Legend Items */
+.chartjs-legend li {
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    font-family: var(--chartjs-font-family) !important;
+    font-size: var(--chartjs-font-size) !important;
+    font-weight: var(--chartjs-font-weight) !important;
+    color: var(--chartjs-text) !important;
+    transition: all 0.2s ease !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+}
+
+.chartjs-legend li:hover {
+    background: var(--chartjs-bg-secondary) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Legend Color Box */
+.chartjs-legend li span {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 3px !important;
+    margin-right: 8px !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.chartjs-legend li:hover span {
+    transform: scale(1.1) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Hidden Legend Items */
+.chartjs-legend li.hidden {
+    opacity: 0.3 !important;
+}
+
+.chartjs-legend li.hidden span {
+    background: var(--chartjs-text-muted) !important;
+}
+
+/* ==========================================================================
+   Chart Color Palette Classes
+   ========================================================================== */
+
+/* Default Color Set */
+.chart-colors-default {
+    --chart-color-1: var(--chartjs-primary);
+    --chart-color-2: var(--chartjs-success);
+    --chart-color-3: var(--chartjs-danger);
+    --chart-color-4: var(--chartjs-warning);
+    --chart-color-5: var(--chartjs-info);
+    --chart-color-6: var(--chartjs-purple);
+    --chart-color-7: var(--chartjs-pink);
+    --chart-color-8: var(--chartjs-orange);
+    --chart-color-9: var(--chartjs-teal);
+    --chart-color-10: var(--chartjs-secondary);
+}
+
+/* Business Color Set */
+.chart-colors-business {
+    --chart-color-1: #2E86AB;
+    --chart-color-2: #A23B72;
+    --chart-color-3: #F18F01;
+    --chart-color-4: #C73E1D;
+    --chart-color-5: #4CAF50;
+    --chart-color-6: #9C27B0;
+    --chart-color-7: #FF5722;
+    --chart-color-8: #607D8B;
+    --chart-color-9: #795548;
+    --chart-color-10: #FF9800;
+}
+
+/* Soft Color Set */
+.chart-colors-soft {
+    --chart-color-1: rgba(0, 123, 255, 0.8);
+    --chart-color-2: rgba(40, 167, 69, 0.8);
+    --chart-color-3: rgba(220, 53, 69, 0.8);
+    --chart-color-4: rgba(255, 193, 7, 0.8);
+    --chart-color-5: rgba(23, 162, 184, 0.8);
+    --chart-color-6: rgba(111, 66, 193, 0.8);
+    --chart-color-7: rgba(232, 62, 140, 0.8);
+    --chart-color-8: rgba(253, 126, 20, 0.8);
+    --chart-color-9: rgba(32, 201, 151, 0.8);
+    --chart-color-10: rgba(108, 117, 125, 0.8);
+}
+
+/* ==========================================================================
+   Chart Animation Enhancement Classes
+   ========================================================================== */
+
+/* Chart Loading Animation */
+.chart-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    border-radius: 8px;
+}
+
+[data-bs-theme="dark"] .chart-loading-overlay {
+    background: rgba(33, 37, 41, 0.8);
+}
+
+.chart-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--chartjs-border);
+    border-top: 3px solid var(--chartjs-primary);
+    border-radius: 50%;
+    animation: chartSpin 1s linear infinite;
+}
+
+@keyframes chartSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Chart Update Animation */
+.chart-updating {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+/* ==========================================================================
+   Responsive Chart Adjustments
+   ========================================================================== */
+
+/* Mobile Chart Adjustments */
+@media (max-width: 576px) {
+    :root {
+        --chartjs-font-size-sm: 9px;
+        --chartjs-font-size: 10px;
+        --chartjs-font-size-lg: 12px;
+        --chartjs-point-radius: 3;
+        --chartjs-point-hover-radius: 5;
+    }
+    
+    .chartjs-legend {
+        padding: 12px 0 6px 0 !important;
+    }
+    
+    .chartjs-legend ul {
+        gap: 8px !important;
+    }
+    
+    .chartjs-legend li {
+        font-size: var(--chartjs-font-size-sm) !important;
+        padding: 4px 8px !important;
+    }
+    
+    .chartjs-legend li span {
+        width: 10px !important;
+        height: 10px !important;
+        margin-right: 6px !important;
+    }
+    
+    div[id^="chartjs-tooltip"] {
+        font-size: var(--chartjs-font-size-sm) !important;
+        padding: 8px !important;
+        max-width: 250px !important;
+    }
+}
+
+/* Tablet Chart Adjustments */
+@media (max-width: 768px) {
+    .chartjs-legend ul {
+        gap: 12px !important;
+    }
+    
+    div[id^="chartjs-tooltip"] {
+        font-size: var(--chartjs-font-size-sm) !important;
+        padding: 10px !important;
+    }
+}
+
+/* ==========================================================================
+   Chart Accessibility Enhancements
+   ========================================================================== */
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --chartjs-border: rgba(0, 0, 0, 0.3);
+        --chartjs-grid: rgba(0, 0, 0, 0.2);
+        --chartjs-text: #000000;
+    }
+    
+    [data-bs-theme="dark"] {
+        --chartjs-border: rgba(255, 255, 255, 0.4);
+        --chartjs-grid: rgba(255, 255, 255, 0.3);
+        --chartjs-text: #ffffff;
+    }
+    
+    .chartjs-legend li {
+        border: 1px solid var(--chartjs-border) !important;
+    }
+    
+    div[id^="chartjs-tooltip"] {
+        border: 1px solid var(--chartjs-border) !important;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .chartjs-render-monitor {
+        animation: none !important;
+    }
+    
+    .chart-loading-spinner {
+        animation: none !important;
+    }
+    
+    .chartjs-legend li {
+        transition: none !important;
+    }
+    
+    div[id^="chartjs-tooltip"] {
+        transition: none !important;
+    }
+}
+
+/* Focus Styles for Accessibility */
+.chartjs-legend li:focus {
+    outline: 2px solid var(--chartjs-primary);
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Chart Print Styles
+   ========================================================================== */
+
+@media print {
+    .chartjs-render-monitor {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    div[id^="chartjs-tooltip"] {
+        display: none !important;
+    }
+    
+    .chartjs-legend {
+        page-break-inside: avoid;
+    }
+    
+    .chart-loading-overlay {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   Chart Utility Classes
+   ========================================================================== */
+
+/* Screen Reader Only */
+.chart-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Chart Canvas Focus */
+canvas:focus {
+    outline: 2px solid var(--chartjs-primary);
+    outline-offset: 2px;
+}
+
+/* No Select for Chart Elements */
+.chart-no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

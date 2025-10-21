@@ -1,0 +1,561 @@
+{% extends "base.html" %}
+
+{% set current_page = 'login' %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block page_title %}
+<i class="far fa-sign-in me-2"></i>Đăng nhập
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sidebar-width: 0px;
+        --sidebar-collapsed-width: 0px;
+        --content-max-width: 400px;
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    [data-bs-theme="dark"] {
+        --glass-bg: rgba(0, 0, 0, 0.3);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    body {
+        background: var(--primary-gradient);
+        background-attachment: fixed;
+        min-height: 100vh;
+        font-family: "Siemens Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .login-container {
+        height: calc(100vh - 100px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Animated background elements */
+    .bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        background: var(--secondary-gradient);
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .bg-shape:nth-child(1) {
+        width: 300px;
+        height: 300px;
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .bg-shape:nth-child(2) {
+        width: 200px;
+        height: 200px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .bg-shape:nth-child(3) {
+        width: 150px;
+        height: 150px;
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 450px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        animation: slideUp 0.8s ease-out;
+        position: relative;
+        z-index: 10;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .login-header {
+        background: var(--primary-gradient);
+        border-radius: 20px 20px 0 0;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: var(--secondary-gradient);
+        opacity: 0.1;
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .login-header h4 {
+        color: white;
+        font-weight: bold;
+        margin: 0;
+        position: relative;
+        z-index: 2;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-header .icon-wrapper {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+
+    .login-header .fas {
+        font-size: 2.5rem;
+        color: white;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .card-body {
+        padding: 2.5rem 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+
+    [data-bs-theme="dark"] .card-body {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Enhanced form elements */
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-floating > .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: var(--bs-body-color);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        padding: 1rem 1.5rem;
+        height: auto;
+    }
+
+    .form-floating > .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-floating > label {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+    }
+
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: rgba(255, 255, 255, 0.9);
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+
+    /* Enhanced buttons */
+    .btn-login {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: white;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-login:hover::before {
+        left: 100%;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-login:active {
+        transform: translateY(-1px);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Enhanced alerts */
+    .alert {
+        border-radius: 12px;
+        border: none;
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-success {
+        background: rgba(40, 167, 69, 0.2);
+        color: #1d7933;
+        border-left: 4px solid #218d3b;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.2);
+        color: #b42c3a;
+        border-left: 4px solid #dc3545;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Input icons */
+    .input-group-text {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.8);
+        border-radius: 12px 0 0 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .form-control {
+        border-radius: 0 12px 12px 0;
+        border-left: none;
+    }
+
+    .form-control:focus {
+        border-left: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .form-floating .form-control {
+        height: 70px;
+        color: rgba(255, 255, 255, 0.9);
+        border-radius: 18px;
+    }
+
+    .form-floating>label {
+        top: 5px;
+    }
+    .form-floating>.form-control:focus~label,
+    .form-floating>.form-control:not(:placeholder-shown)~label {
+        top: -1px;
+    }
+    .form-floating>.form-control:focus~label::after,
+    .form-floating>.form-control:not(:placeholder-shown)~label::after {
+        background-color: transparent!important;
+    }
+
+    /* Loading animation */
+    .loading-dots::after {
+        content: '';
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0%, 20% { content: ''; }
+        40% { content: '.'; }
+        60% { content: '..'; }
+        80%, 100% { content: '...'; }
+    }
+
+    /* Responsive design */
+    @media (max-width: 576px) {
+        .login-card {
+            margin: 1rem;
+            max-width: none;
+        }
+
+        .login-header {
+            padding: 1.5rem 1rem;
+        }
+
+        .card-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .bg-shape {
+            display: none;
+        }
+    }
+
+    /* Pulse animation for focus states */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+
+    .form-control:focus {
+        animation: pulse 2s infinite;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Animated background shapes -->
+    <div class="bg-shape"></div>
+    <div class="bg-shape"></div>
+    <div class="bg-shape"></div>
+
+    <div class="login-container">
+        <div class="card login-card">
+            <div class="login-header">
+                <div class="icon-wrapper">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h4>Đăng nhập hệ thống</h4>
+                <p class="mb-0 text-white-50">Quản lý hệ thống Server</p>
+            </div>
+
+            <div class="card-body">
+                <!-- Error Alert -->
+                <div id="errorAlert" class="alert alert-danger d-none fade-in" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+
+                <!-- Success Alert -->
+                <div id="successAlert" class="alert alert-success d-none fade-in" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="successMessage"></span>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Tên đăng nhập" required>
+                        <label for="username">
+                            <i class="fas fa-user me-2"></i>Tên đăng nhập
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" required>
+                        <label for="password">
+                            <i class="fas fa-lock me-2"></i>Mật khẩu
+                        </label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-login" id="loginBtn">
+                            <i class="fas fa-sign-in me-2"></i>
+                            <span>Đăng nhập</span>
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <small class="text-white-50">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Kết nối bảo mật SSL
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const loginBtn = document.getElementById('loginBtn');
+    const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    // Hide alerts with animation
+    errorAlert.classList.add('d-none');
+    successAlert.classList.add('d-none');
+
+    // Disable button and add loading animation
+    loginBtn.disabled = true;
+    loginBtn.style.transform = 'scale(0.98)';
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xác thực<span class="loading-dots"></span>';
+
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            successAlert.classList.remove('d-none');
+            document.getElementById('successMessage').textContent = data.message;
+
+            // Success animation
+            loginBtn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            loginBtn.style.padding = '15px 20px';
+            loginBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Đăng nhập thành công!';
+
+            // Redirect to dashboard after 1.5 seconds
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+        } else {
+            errorAlert.classList.remove('d-none');
+            document.getElementById('errorMessage').textContent = data.message;
+
+            // Error animation
+            loginBtn.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                loginBtn.style.animation = '';
+            }, 500);
+        }
+    } catch (error) {
+        errorAlert.classList.remove('d-none');
+        document.getElementById('errorMessage').textContent = 'Lỗi kết nối. Vui lòng thử lại.';
+
+        // Error animation
+        loginBtn.style.animation = 'shake 0.5s ease-in-out';
+        setTimeout(() => {
+            loginBtn.style.animation = '';
+        }, 500);
+    } finally {
+        // Re-enable button if not successful
+        if (!document.getElementById('successAlert').classList.contains('d-none')) {
+            return; // Don't re-enable if successful
+        }
+
+        loginBtn.disabled = false;
+        loginBtn.style.transform = '';
+        loginBtn.innerHTML = '<i class="fas fa-sign-in me-2"></i>Đăng nhập';
+    }
+});
+
+// Add shake animation for errors
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+`;
+document.head.appendChild(style);
+
+// Add input focus effects
+document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+    });
+
+    input.addEventListener('blur', function() {
+        this.parentElement.style.transform = '';
+    });
+});
+
+// Check if already logged in
+window.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+
+        if (data.authenticated) {
+            // Already logged in, redirect to dashboard
+            window.location.href = '/';
+        }
+    } catch (error) {
+        // Ignore errors, user will see login form
+    }
+
+    // Add entrance animation to the card
+    const loginCard = document.querySelector('.login-card');
+    loginCard.style.opacity = '0';
+    loginCard.style.transform = 'translateY(50px) scale(0.9)';
+
+    setTimeout(() => {
+        loginCard.style.transition = 'all 0.8s ease-out';
+        loginCard.style.opacity = '1';
+        loginCard.style.transform = 'translateY(0) scale(1)';
+    }, 100);
+});
+</script>
+{% endblock %}
