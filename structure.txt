@@ -1,0 +1,159 @@
+.
+├── app
+│   ├── .DS_Store
+│   ├── __init__.py
+│   ├── models
+│   │   └── __init__.py
+│   ├── routes
+│   │   ├── api.py
+│   │   └── ui.py
+│   └── services
+│       ├── auth_service.py
+│       ├── db.py
+│       ├── __init__.py
+│       ├── mqtt_service.py
+│       ├── pi_status.py
+│       └── supervisor_service.py
+├── .env
+├── .git
+│   ├── branches
+│   ├── COMMIT_EDITMSG
+│   ├── config
+│   ├── description
+│   ├── HEAD
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── push-to-checkout.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   ├── objects
+│   │   ├── 04
+│   │   ├── 0b
+│   │   ├── 11
+│   │   ├── 12
+│   │   ├── 17
+│   │   ├── 18
+│   │   ├── 1a
+│   │   ├── 1b
+│   │   ├── 1f
+│   │   ├── 21
+│   │   ├── 22
+│   │   ├── 25
+│   │   ├── 29
+│   │   ├── 32
+│   │   ├── 34
+│   │   ├── 36
+│   │   ├── 38
+│   │   ├── 3d
+│   │   ├── 3f
+│   │   ├── 46
+│   │   ├── 4b
+│   │   ├── 4c
+│   │   ├── 4d
+│   │   ├── 55
+│   │   ├── 5a
+│   │   ├── 61
+│   │   ├── 62
+│   │   ├── 68
+│   │   ├── 7a
+│   │   ├── 7e
+│   │   ├── 81
+│   │   ├── 86
+│   │   ├── 87
+│   │   ├── 8f
+│   │   ├── 90
+│   │   ├── 93
+│   │   ├── 94
+│   │   ├── 96
+│   │   ├── 9c
+│   │   ├── a0
+│   │   ├── a7
+│   │   ├── a9
+│   │   ├── ac
+│   │   ├── b9
+│   │   ├── c1
+│   │   ├── c7
+│   │   ├── c8
+│   │   ├── cf
+│   │   ├── d5
+│   │   ├── d7
+│   │   ├── dd
+│   │   ├── e1
+│   │   ├── e3
+│   │   ├── e6
+│   │   ├── e8
+│   │   ├── eb
+│   │   ├── ed
+│   │   ├── f0
+│   │   ├── f3
+│   │   ├── f6
+│   │   ├── f7
+│   │   ├── fa
+│   │   ├── fb
+│   │   ├── info
+│   │   └── pack
+│   ├── packed-refs
+│   └── refs
+│       ├── heads
+│       ├── remotes
+│       └── tags
+├── init_db.py
+├── main.py
+├── README.md
+├── requirements.txt
+├── static
+│   ├── css
+│   │   ├── chartjs.css
+│   │   ├── main.css
+│   │   ├── theme.css
+│   │   └── toast.css
+│   ├── .DS_Store
+│   ├── font
+│   │   ├── Siemens Sans Bold Italic.ttf
+│   │   ├── Siemens Sans Bold.ttf
+│   │   ├── Siemens Sans Italic.ttf
+│   │   └── Siemens Sans Roman.ttf
+│   ├── img
+│   │   ├── logo_fet.png
+│   │   ├── logo_iuh.png
+│   │   └── tank.png
+│   └── js
+│       ├── chart-theme.js
+│       ├── SensorChart.js
+│       ├── theme-manager.js
+│       ├── toast-manager.js
+│       └── upload-manager.js
+├── structure.txt
+└── templates
+    ├── base.html
+    ├── .DS_Store
+    ├── pages
+    │   ├── dashboard.html
+    │   ├── data.html
+    │   ├── login.html
+    │   ├── recipe.html
+    │   └── status.html
+    └── partials
+        ├── navbar.html
+        ├── README.md
+        ├── sidebar.html
+        ├── tank-color.js
+        ├── tank copy.html
+        └── tank.html
+
+89 directories, 68 files
