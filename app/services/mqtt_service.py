@@ -4,19 +4,28 @@ import time
 from datetime import datetime
 import paho.mqtt.client as mqtt
 from .db import PostgresDB
-
+import dotenv
+dotenv.load_dotenv()
 
 class MqttService:
     """MQTT collector: đọc dữ liệu từ topic vbox/summary và ghi vào PostgreSQL."""
 
-    def __init__(self):
+    def __init__(self, broker="", port=1883, username="", password="", client_id="", topic=""):
         # --- MQTT configuration ---
-        self.broker = os.getenv("MQTT_BROKER", "localhost")
-        self.port = int(os.getenv("MQTT_PORT", 1883))
-        self.username = os.getenv("MQTT_USERNAME", "pi")
-        self.password = os.getenv("MQTT_PASSWORD", "raspberry")
-        self.client_id = os.getenv("MQTT_CLIENT_ID", "pi_mqtt")
-        self.topic = os.getenv("MQTT_TOPIC", "vbox/summary")
+        if not broker and not username and not password and not client_id and not topic:
+            broker = os.getenv('MQTT_BROKER')
+            port = int(os.getenv('MQTT_PORT', 1883))
+            username = os.getenv('MQTT_USERNAME')
+            password = os.getenv('MQTT_PASSWORD')
+            client_id = os.getenv('MQTT_CLIENT_ID')
+            topic = os.getenv('MQTT_TOPIC')
+
+        self.broker = broker
+        self.port = port
+        self.username = username
+        self.password = password
+        self.client_id = client_id
+        self.topic = topic
 
         # --- DB service ---
         self.db = PostgresDB()
@@ -33,9 +42,9 @@ class MqttService:
     # ------------------------------------------------------------------
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            print(f"✅ Connected to MQTT broker at {self.broker}:{self.port}")
+            # print(f"✅ Connected to MQTT broker at {self.broker}:{self.port}")
             self.client.subscribe(self.topic)
-            print(f"📡 Subscribed to topic: {self.topic}")
+            # print(f"📡 Subscribed to topic: {self.topic}")
         else:
             print(f"❌ MQTT connection failed (rc={rc})")
 
@@ -82,7 +91,7 @@ class MqttService:
                 )
 
 
-                print(f"💾 Inserted {key}={value} → channel_id={channel_id}")
+                # print(f"💾 Inserted {key}={value} → channel_id={channel_id}")
 
         except Exception as e:
             print(f"❌ Error processing MQTT message: {e}")
@@ -117,5 +126,5 @@ class MqttService:
 
 # Allow standalone run for debug
 if __name__ == "__main__":
-    mqtt_service = MqttService()
+    mqtt_service = MqttService(broker='', port=1883, username='', password='', client_id='', topic='')
     mqtt_service.run()
