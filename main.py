@@ -1,12 +1,13 @@
 from flask import Flask, session, g
 import dotenv
 import os
+from threading import Thread
 dotenv.load_dotenv()
 
 from app.routes.ui import ui_bp
 from app.routes.api import api
 from app.services.auth_service import AuthService
-
+from app.services.mqtt_service import MqttService
 app = Flask(__name__)
 
 # Session configuration
@@ -36,6 +37,21 @@ def inject_user():
         'is_authenticated': g.is_authenticated,
         'is_admin': g.is_admin
     }
+
+# ----------------------------
+# MQTT Background Thread
+# ----------------------------
+def start_mqtt_service():
+    try:
+        mqtt_service = MqttService()
+        mqtt_service.run()  # This will loop_forever()
+    except Exception as e:
+        print(f"[MQTT Collector] Error starting MQTT service: {e}")
+
+# Start MQTT thread
+mqtt_thread = Thread(target=start_mqtt_service, daemon=True)
+mqtt_thread.start()
+print("✅ MQTT service started in background thread.")
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
