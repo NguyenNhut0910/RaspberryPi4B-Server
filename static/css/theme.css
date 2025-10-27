@@ -2315,3 +2315,59 @@ a:hover {
   border-color: #2563eb;
   border-right-color: transparent;
 }
+/* --- Mini MQTT Switch --- */
+#mqttSwitch.form-check-input {
+  transform: scale(0.8);           /* giảm kích thước 80% */
+  width: 2em;                      /* chiều rộng */
+  height: 1em;                     /* chiều cao */
+  cursor: pointer;
+  margin-top: 0;                   /* canh giữa theo chiều dọc */
+}
+
+.dropdown-item .form-check.form-switch {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+/* #mqttSwitch.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.15rem rgba(var(--bs-primary-rgb), 0.25);
+} */
+/* Fix: Remove checkmark icon for form-switch toggles */
+/* .form-switch .form-check-input:checked::after {
+  content: none !important;
+} */
+/* MQTT switch glow effect */
+/* #mqttSwitch.form-check-input:checked {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  box-shadow: 0 0 6px rgba(var(--bs-primary-rgb), 0.6);
+  transition: all 0.3s ease;
+} */
+
+/* #mqttSwitch.form-check-input {
+  transition: all 0.3s ease;
+} */
+
+/* Căn công tắc MQTT Collector sát bên phải */
+.dropdown-item.mqtt-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 8px; /* đẩy switch sát phải */
+}
+
+.dropdown-item.mqtt-toggle span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#mqttSwitch.form-check-input {
+  transform: scale(0.8);
+  margin-top: 0;
+  margin-left: 10px; /* khoảng cách với chữ */
+  cursor: pointer;
+  accent-color: var(--bs-primary);
+}
