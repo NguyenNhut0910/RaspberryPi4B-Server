@@ -78,7 +78,7 @@ class MqttService:
                 return
 
             for key, value in payload.items():
-                if key in ["device", "area_id", "machine", "timestamp", "factory_id", "gateway_id"]:
+                if key in ["factory_id", "gateway_id", "device", "area_id", "machine", "timestamp"]:
                     continue
                 if not isinstance(value, (int, float)):
                     continue
@@ -93,6 +93,7 @@ class MqttService:
                     continue
 
                 channel_id = rows[0]["channel_id"]
+                # Ghi vào measurement
                 # quality = 'Good' if value > 0 else 'Uncertain'
                 quality = 'Good'
                 self.db.execute_non_query(
