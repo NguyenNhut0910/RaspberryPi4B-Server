@@ -57,7 +57,7 @@ class PostgresDB:
         try:
             self.cursor.execute(query, params)
             self.connection.commit()
-            print("Query executed successfully.")
+            # print("Query executed successfully.")
         except Exception as e:
             self.connection.rollback()
             print(f"Error executing query: {e}")
