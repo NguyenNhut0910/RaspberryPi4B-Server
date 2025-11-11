@@ -41,12 +41,23 @@ def inject_user():
 # ----------------------------
 # MQTT Background Thread
 # ----------------------------
+# def start_mqtt_service():
+#     try:
+#         mqtt_service = MqttService()
+#         mqtt_service.run()  # This will loop_forever()
+#     except Exception as e:
+#         print(f"[MQTT Collector] Error starting MQTT service: {e}")
 def start_mqtt_service():
     try:
-        mqtt_service = MqttService()
-        mqtt_service.run()  # This will loop_forever()
+        from app.services.mqtt_service import MqttService
+        mqtt_service = MqttService.instance()
+        # # Không tự động chạy — chỉ khởi tạo để sẵn sàng nhận lệnh /api/mqtt/start
+        print("✅ MQTT Collector initialized and ready (manual start).")
+        # ✅ Bật Collector ngay khi server khởi động
+        # mqtt_service.start()
+        print("🚀 MQTT Collector auto-started at boot.")
     except Exception as e:
-        print(f"[MQTT Collector] Error starting MQTT service: {e}")
+        print(f"[MQTT Collector] Error initializing MQTT service: {e}")
 
 # Start MQTT thread
 mqtt_thread = Thread(target=start_mqtt_service, daemon=True)

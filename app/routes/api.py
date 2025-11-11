@@ -10,13 +10,14 @@ from functools import wraps
 from app.services.pi_status import PiStatusService
 from app.services.auth_service import AuthService
 from app.services.supervisor_service import SupervisorService
-
+from app.services.mqtt_service import MqttService
 
 # Create API blueprint
 api = Blueprint('api', __name__, url_prefix='/api')
 
 auth_service = AuthService()
 supervisor_service = SupervisorService()
+
 
 def require_auth(f):
     """Decorator to require authentication for API routes."""
@@ -41,6 +42,27 @@ def require_admin(f):
             }), 403
         return f(*args, **kwargs)
     return decorated_function
+
+mqtt_service = MqttService.instance()  # dùng singleton để giữ kết nối MQTT
+@api.route('/mqtt/status')
+def mqtt_status():
+    return jsonify({'running': mqtt_service.is_running()})
+
+@api.route('/mqtt/start', methods=['POST'])
+def mqtt_start():
+    try:
+        mqtt_service.start()
+        return jsonify({'success': True, 'message': 'MQTT Collector started.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@api.route('/mqtt/stop', methods=['POST'])
+def mqtt_stop():
+    try:
+        mqtt_service.stop()
+        return jsonify({'success': True, 'message': 'MQTT Collector stopped.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
 # Error handlers
 @api.errorhandler(404)
@@ -209,3 +231,4 @@ def register():
             'success': False,
             'message': message
         }), 400
+

@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import threading
 from datetime import datetime
 import paho.mqtt.client as mqtt
 from .db import PostgresDB
@@ -9,6 +10,17 @@ dotenv.load_dotenv()
 
 class MqttService:
     """MQTT collector: đọc dữ liệu từ topic vbox/summary và ghi vào PostgreSQL."""
+    _instance = None
+    _lock = threading.Lock()
+
+    @staticmethod
+    def instance():
+        """Singleton pattern để dùng chung 1 service."""
+        if MqttService._instance is None:
+            with MqttService._lock:
+                if MqttService._instance is None:
+                    MqttService._instance = MqttService()
+        return MqttService._instance
 
     def __init__(self, broker="", port=1883, username="", password="", client_id="", topic=""):
         # --- MQTT configuration ---
@@ -27,6 +39,10 @@ class MqttService:
         self.client_id = client_id
         self.topic = topic
 
+        # --- State ---
+        self._running = False
+        self._thread = None
+
         # --- DB service ---
         self.db = PostgresDB()
 
@@ -42,9 +58,9 @@ class MqttService:
     # ------------------------------------------------------------------
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            # print(f"✅ Connected to MQTT broker at {self.broker}:{self.port}")
+            print(f"✅ Connected to MQTT broker at {self.broker}:{self.port}")
             self.client.subscribe(self.topic)
-            # print(f"📡 Subscribed to topic: {self.topic}")
+            print(f"📡 Subscribed to topic: {self.topic}")
         else:
             print(f"❌ MQTT connection failed (rc={rc})")
 
@@ -52,14 +68,13 @@ class MqttService:
         """Handle incoming MQTT messages."""
         try:
             payload = json.loads(msg.payload.decode())
-            print(f"[MQTT] {msg.topic}: {payload}")
+            # print(f"[MQTT] {msg.topic}: {payload}")
 
             device_id = int(payload.get("device", 0))
             timestamp = payload.get("timestamp") or datetime.now().isoformat()
 
-            # Mở kết nối DB (với retry)
             if not self.connect_db_with_retry():
-                print("❌ Database not ready, skipping this message.")
+                print("❌ Database not ready, skipping message.")
                 return
 
             for key, value in payload.items():
@@ -68,7 +83,6 @@ class MqttService:
                 if not isinstance(value, (int, float)):
                     continue
 
-                # Tìm channel_id (sử dụng channel_name để khớp schema thật)
                 rows = self.db.execute_query(
                     "SELECT channel_id FROM channel WHERE device_id = %s AND channel_name = %s",
                     (device_id, key)
@@ -79,7 +93,6 @@ class MqttService:
                     continue
 
                 channel_id = rows[0]["channel_id"]
-
                 # Ghi vào measurement
                 # quality = 'Good' if value > 0 else 'Uncertain'
                 quality = 'Good'
@@ -90,9 +103,6 @@ class MqttService:
                     """,
                     (channel_id, float(value), quality, timestamp)
                 )
-
-
-                # print(f"💾 Inserted {key}={value} → channel_id={channel_id}")
 
         except Exception as e:
             print(f"❌ Error processing MQTT message: {e}")
@@ -112,20 +122,49 @@ class MqttService:
         return False
 
     # ------------------------------------------------------------------
-    # MAIN LOOP
+    # MQTT CONTROL
     # ------------------------------------------------------------------
-    def run(self):
-        """Connect and listen forever."""
-        while True:
+    def _loop(self):
+        """Main loop chạy nền."""
+        while self._running:
             try:
                 self.client.connect(self.broker, self.port, 60)
-                self.client.loop_forever()
+                self.client.loop_start()
+                while self._running:
+                    time.sleep(1)
+                self.client.loop_stop()
+                self.client.disconnect()
             except Exception as e:
                 print(f"❌ MQTT connection error: {e}")
-                time.sleep(5)  # Wait before reconnecting
+                time.sleep(5)
+
+    def start(self):
+        """Bắt đầu đọc dữ liệu MQTT."""
+        if self._running:
+            print("⚠️ MQTT Collector is already running.")
+            return
+        self._running = True
+        self._thread = threading.Thread(target=self._loop, daemon=True)
+        self._thread.start()
+        print("🚀 MQTT Collector started.")
+
+    def stop(self):
+        """Dừng đọc dữ liệu MQTT."""
+        if not self._running:
+            print("⚠️ MQTT Collector is not running.")
+            return
+        self._running = False
+        print("🛑 MQTT Collector stopped.")
+
+    def is_running(self):
+        return self._running
 
 
-# Allow standalone run for debug
+# ----------------------------------------------------------------------
+# Debug standalone
+# ----------------------------------------------------------------------
 if __name__ == "__main__":
-    mqtt_service = MqttService(broker='', port=1883, username='', password='', client_id='', topic='')
-    mqtt_service.run()
+    mqtt_service = MqttService.instance()
+    mqtt_service.start()
+    time.sleep(10)
+    mqtt_service.stop()

@@ -61,6 +61,19 @@
                         <hr class="dropdown-divider">
                     </li>
                     <li>
+                    <div class="dropdown-item d-flex align-items-center justify-content-between">
+                            <span>
+                                <i class="fas fa-broadcast-tower me-2"></i>
+                                MQTT Collector 
+                            </span>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" id="mqttSwitch">
+                            </div>
+                        </div>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
                         <a class="dropdown-item text-danger" href="{{ url_for('ui.logout') }}">
                             <i class="far fa-sign-out me-2"></i>
                             Đăng xuất
@@ -129,6 +142,30 @@
         transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     }
 </style>
+
+<!-- MQTT -->
+<script>
+    const mqttSwitch = document.getElementById('mqttSwitch');
+
+    // Lấy trạng thái từ server khi load trang
+    fetch('/api/mqtt/status')
+        .then(res => res.json())
+        .then(data => {
+            mqttSwitch.checked = data.running;
+        });
+
+    // Gửi yêu cầu bật/tắt MQTT collector
+    mqttSwitch.addEventListener('change', async () => {
+        const state = mqttSwitch.checked ? 'start' : 'stop';
+        const res = await fetch(`/api/mqtt/${state}`, { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) {
+            alert('❌ ' + data.message);
+            mqttSwitch.checked = !mqttSwitch.checked; // rollback nếu lỗi
+        }
+    });
+</script>
+<!--  -->
 
 <script>
     const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
