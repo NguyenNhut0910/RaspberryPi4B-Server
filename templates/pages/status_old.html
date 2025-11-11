@@ -1,0 +1,512 @@
+{% extends "base.html" %}
+
+{% set current_page = 'status' %}
+
+{% block title %}Trạng thái Hệ thống - Raspberry Pi Server{% endblock %}
+
+{% block page_title %}
+<i class="far fa-server me-2"></i>Trạng thái Hệ thống
+{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --sidebar-width: 0px;
+        --sidebar-collapsed-width: 0px;
+        --content-max-width: 1400px;
+    }
+    .card-md {
+        height: 128px;
+    }
+    .sidebar {
+        display: none;
+    }
+    .logs-content {
+        transition: max-height 0.3s ease;
+        max-height: 400px;
+        overflow: auto;
+        background: rgba(var(--bs-light-rgb), 1);
+    }
+    .logs-content.fullscreen {
+        max-height: calc(100vh - 200px) !important;
+    }
+    .modal-fullscreen .modal-body {
+        overflow-y: hidden;
+    }
+
+    [data-bs-theme="dark"] .logs-content {
+        background: var(--bs-gray-800);
+        color: var(--bs-body-color);
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="row mt-lg-5 mt-3 px-2 py-3">
+
+        <!-- CPU Usage -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card card-1 card-md">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fal fa-microchip me-3 fs-4"></i>
+                    <h5 class="mb-0">CPU Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                            <div class="progress-bar bg-primary" role="progressbar" id="cpu-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="fs-5 fw-bold" id="cpu-percent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Usage -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card card-1 card-md">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fal fa-memory me-3 fs-4"></i>
+                    <h5 class="mb-0">Memory Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar" id="memory-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="fs-5 fw-bold" id="memory-percent">0%</span>
+                    </div>
+                    <div class="mt-2 text-muted small">
+                        Used: <span id="memory-used">0 MB</span> / <span id="memory-total">0 MB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disk Usage -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card card-1 card-md">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fal fa-hdd me-3 fs-4"></i>
+                    <h5 class="mb-0">Disk Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-3" style="height: 20px;">
+                            <div class="progress-bar bg-warning" role="progressbar" id="disk-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="fs-5 fw-bold" id="disk-percent">0%</span>
+                    </div>
+                    <div class="mt-2 text-muted small">
+                        Used: <span id="disk-used">0 GB</span> / <span id="disk-total">0 GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card card-1 card-md">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fal fa-temperature-half me-3 fs-4"></i>
+                    <h5 class="mb-0">Temperature</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="fs-1 fw-bold me-2" id="temperature">0°C</span>
+                        <i class="fal fa-thermometer-half fs-2 text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uptime -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card card-1 card-md">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fal fa-clock me-3 fs-4"></i>
+                    <h5 class="mb-0">Uptime</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <span class="fs-4 fw-bold" id="uptime">00:00:00</span>
+                        <div class="text-muted small mt-1">Days:Hours:Minutes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Info -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card card-1 card-md">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fal fa-network-wired me-3 fs-4"></i>
+                    <h5 class="mb-0">Network</h5>
+                </div>
+                <div class="card-body">
+                    <div id="network-info" class="text-muted small">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Docker Containers -->
+    <div class="row px-2 py-3">
+        <div class="col-12">
+            <div class="card card-1">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fab fa-docker me-3 fs-4"></i>
+                    <h5 class="mb-0">Docker Containers</h5>
+                </div>
+                <div class="card-body">
+                    <div id="docker-containers" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Image</th>
+                                    <th>Status</th>
+                                    <th>State</th>
+                                    <th>Ports</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docker-table-body">
+                                <tr>
+                                    {% if current_user %}
+                                        <td colspan="6" class="text-center text-muted">Loading Docker containers...</td>
+                                    {% else %}
+                                        <td colspan="6" class="text-center text-muted">Please log in to view Docker container information.</td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supervisor Processes -->
+    <div class="row px-2 py-3">
+        <div class="col-12">
+            <div class="card card-1">
+                <div class="card-header d-flex align-items-center border-0">
+                    <i class="fas fa-tasks me-3 fs-4"></i>
+                    <h5 class="mb-0">Supervisor Processes</h5>
+                </div>
+                <div class="card-body">
+                    <div id="supervisor-processes" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Group</th>
+                                    <th>PID</th>
+                                    <th>State</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="supervisor-table-body">
+                                <tr>
+                                    {% if current_user %}
+                                        <td colspan="6" class="text-center text-muted">Loading Supervisor processes...</td>
+                                    {% else %}
+                                        <td colspan="6" class="text-center text-muted">Please log in to view Supervisor processes information.</td>
+                                    {% endif %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Last Updated -->
+    <div class="row px-2">
+        <div class="col-12">
+            <div class="text-center text-muted small">
+                Last updated: <span id="last-updated">Never</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Logs Modal -->
+<div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-fullscreen-lg-down" id="logsModalDialog">
+        <div class="modal-content">
+            <div class="modal-header d-flex">
+                <h5 class="modal-title" id="logsModalLabel">Process Logs</h5>
+                <div class="d-flex align-items-center ms-auto">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="fullscreenBtn" title="Toggle Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="logsTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="stdout-tab" data-bs-toggle="tab" data-bs-target="#stdout" type="button" role="tab" aria-controls="stdout" aria-selected="true">Stdout</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="stderr-tab" data-bs-toggle="tab" data-bs-target="#stderr" type="button" role="tab" aria-controls="stderr" aria-selected="false">Stderr</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="logsTabContent">
+                    <div class="tab-pane fade show active" id="stdout" role="tabpanel" aria-labelledby="stdout-tab">
+                        <pre id="stdout-content" class="p-3 mt-3 logs-content">Loading...</pre>
+                    </div>
+                    <div class="tab-pane fade" id="stderr" role="tabpanel" aria-labelledby="stderr-tab">
+                        <pre id="stderr-content" class="p-3 mt-3 logs-content">Loading...</pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function formatUptime(seconds) {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+function updateStatus() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const status = data.data;
+
+                // CPU
+                if (typeof status.cpu_usage === 'number') {
+                    document.getElementById('cpu-percent').textContent = status.cpu_usage.toFixed(1) + '%';
+                    document.getElementById('cpu-progress').style.width = status.cpu_usage + '%';
+                }
+
+                // Memory
+                if (status.memory && typeof status.memory.percent === 'number') {
+                    document.getElementById('memory-percent').textContent = status.memory.percent.toFixed(1) + '%';
+                    document.getElementById('memory-progress').style.width = status.memory.percent + '%';
+                    document.getElementById('memory-used').textContent = formatBytes(status.memory.used);
+                    document.getElementById('memory-total').textContent = formatBytes(status.memory.total);
+                }
+
+                // Disk
+                if (status.disk && typeof status.disk.percent === 'number') {
+                    document.getElementById('disk-percent').textContent = status.disk.percent.toFixed(1) + '%';
+                    document.getElementById('disk-progress').style.width = status.disk.percent + '%';
+                    document.getElementById('disk-used').textContent = formatBytes(status.disk.used);
+                    document.getElementById('disk-total').textContent = formatBytes(status.disk.total);
+                }
+
+                // Temperature
+                if (typeof status.temperature === 'number') {
+                    document.getElementById('temperature').textContent = status.temperature.toFixed(1) + '°C';
+                }
+
+                // Uptime
+                if (typeof status.uptime === 'number') {
+                    document.getElementById('uptime').textContent = formatUptime(status.uptime);
+                }
+
+                // Network
+                if (status.network) {
+                    let networkHtml = '';
+                    for (const [interfaceName, addresses] of Object.entries(status.network)) {
+                        if (addresses.length > 0) {
+                            networkHtml += `<div><strong>${interfaceName}:</strong> ${addresses[0].address}</div>`;
+                        }
+                    }
+                    document.getElementById('network-info').innerHTML = networkHtml || 'No network interfaces found';
+                }
+
+                // Docker Containers
+                if (status.docker_containers) {
+                    const tbody = document.getElementById('docker-table-body');
+                    if (Array.isArray(status.docker_containers)) {
+                        if (status.docker_containers.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No Docker containers found</td></tr>';
+                        } else {
+                            tbody.innerHTML = status.docker_containers.map(container => {
+                                const created = new Date(container.created).toLocaleString();
+                                const ports = Object.keys(container.ports || {}).length > 0 
+                                    ? Object.entries(container.ports).map(([key, value]) => 
+                                        value ? `${key} -> ${value[0].HostIp}:${value[0].HostPort}` : key
+                                      ).join(', ') 
+                                    : 'None';
+                                
+                                const statusBadge = container.state === 'running' 
+                                    ? '<span class="badge bg-success">Running</span>' 
+                                    : container.state === 'exited'
+                                    ? '<span class="badge bg-secondary">Exited</span>'
+                                    : `<span class="badge bg-warning">${container.state}</span>`;
+                                
+                                return `
+                                    <tr>
+                                        <td><code>${container.name}</code></td>
+                                        <td><small>${container.image}</small></td>
+                                        <td>${statusBadge}</td>
+                                        <td><small>${container.status}</small></td>
+                                        <td><small>${ports}</small></td>
+                                        <td><small>${created}</small></td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        }
+                    } else if (status.docker_containers.error) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error: ${status.docker_containers.error}</td></tr>`;
+                    }
+                }
+
+                // Supervisor Processes
+                if (status.supervisor && status.supervisor.processes) {
+                    const tbody = document.getElementById('supervisor-table-body');
+                    if (Array.isArray(status.supervisor.processes)) {
+                        if (status.supervisor.processes.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No Supervisor processes found</td></tr>';
+                        } else {
+                            tbody.innerHTML = status.supervisor.processes.map(process => {
+                                const stateBadge = process.state === 'RUNNING'
+                                    ? '<span class="badge bg-success">Running</span>'
+                                    : process.state === 'STOPPED'
+                                    ? '<span class="badge bg-secondary">Stopped</span>'
+                                    : process.state === 'STARTING'
+                                    ? '<span class="badge bg-warning">Starting</span>'
+                                    : process.state === 'STOPPING'
+                                    ? '<span class="badge bg-warning">Stopping</span>'
+                                    : `<span class="badge bg-info">${process.state}</span>`;
+                                
+                                return `
+                                    <tr>
+                                        <td><code>${process.name}</code></td>
+                                        <td><small>${process.group}</small></td>
+                                        <td><small>${process.pid || 'N/A'}</small></td>
+                                        <td>${stateBadge}</td>
+                                        <td><small>${process.description || 'N/A'}</small></td>
+                                        <td><button class="btn btn-sm btn-outline-primary" onclick="viewLogs('${process.name}')">View Logs</button></td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        }
+                    } else if (status.supervisor.error) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error: ${status.supervisor.error}</td></tr>`;
+                    }
+                }
+
+                // Last updated
+                document.getElementById('last-updated').textContent = new Date().toLocaleString();
+            } else {
+                console.error('Failed to fetch status:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching status:', error);
+        });
+}
+
+// Update status immediately and then every 5 seconds
+updateStatus();
+setInterval(updateStatus, 5000);
+
+function viewLogs(processName) {
+    // Set modal title
+    document.getElementById('logsModalLabel').textContent = `Logs for ${processName}`;
+    
+    // Show loading
+    document.getElementById('stdout-content').textContent = 'Loading...';
+    document.getElementById('stderr-content').textContent = 'Loading...';
+    
+    // Reset to normal size
+    const modalDialog = document.getElementById('logsModalDialog');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const icon = fullscreenBtn.querySelector('i');
+    const logContents = document.querySelectorAll('.logs-content');
+    modalDialog.classList.remove('modal-fullscreen');
+    modalDialog.classList.add('modal-lg', 'modal-fullscreen-lg-down');
+    icon.className = 'fas fa-expand';
+    fullscreenBtn.setAttribute('title', 'Toggle Fullscreen');
+    logContents.forEach(el => el.classList.remove('fullscreen'));
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('logsModal'));
+    modal.show();
+    
+    // Fetch stdout logs
+    fetch(`/api/supervisor/process/${processName}/logs/stdout?length=2048`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('stdout-content').textContent = data.data || 'No stdout logs available';
+            } else {
+                document.getElementById('stdout-content').textContent = 'Error loading stdout logs';
+            }
+        })
+        .catch(error => {
+            document.getElementById('stdout-content').textContent = 'Error loading stdout logs';
+        });
+    
+    // Fetch stderr logs
+    fetch(`/api/supervisor/process/${processName}/logs/stderr?length=2048`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('stderr-content').textContent = data.data || 'No stderr logs available';
+            } else {
+                document.getElementById('stderr-content').textContent = 'Error loading stderr logs';
+            }
+        })
+        .catch(error => {
+            document.getElementById('stderr-content').textContent = 'Error loading stderr logs';
+        });
+}
+
+// Fullscreen toggle function
+document.getElementById('fullscreenBtn').addEventListener('click', function() {
+    const modalDialog = document.getElementById('logsModalDialog');
+    const icon = this.querySelector('i');
+    const logContents = document.querySelectorAll('.logs-content');
+    
+    if (modalDialog.classList.contains('modal-fullscreen')) {
+        // Exit fullscreen
+        modalDialog.classList.remove('modal-fullscreen');
+        modalDialog.classList.add('modal-lg', 'modal-fullscreen-lg-down');
+        icon.className = 'fas fa-expand';
+        this.setAttribute('title', 'Toggle Fullscreen');
+        logContents.forEach(el => el.classList.remove('fullscreen'));
+    } else {
+        // Enter fullscreen
+        modalDialog.classList.remove('modal-lg', 'modal-fullscreen-lg-down');
+        modalDialog.classList.add('modal-fullscreen');
+        icon.className = 'fas fa-compress';
+        this.setAttribute('title', 'Exit Fullscreen');
+        logContents.forEach(el => el.classList.add('fullscreen'));
+    }
+});
+</script>
+{% endblock %}
