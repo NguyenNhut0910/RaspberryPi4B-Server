@@ -103,6 +103,13 @@ class MqttService:
                     """,
                     (channel_id, float(value), quality, timestamp)
                 )
+                self.db.execute_non_query(
+                    """
+                    INSERT INTO dev (channel_id, value, quality, ts)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (channel_id, float(value), quality, timestamp)
+                )
 
         except Exception as e:
             print(f"❌ Error processing MQTT message: {e}")
